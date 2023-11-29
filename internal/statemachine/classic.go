@@ -74,6 +74,15 @@ func (classicStateMachine *ClassicStateMachine) Setup() error {
 		return err
 	}
 
+	if err := classicStateMachine.SetSeries(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (classicStateMachine *ClassicStateMachine) SetSeries() error {
+	classicStateMachine.series = classicStateMachine.ImageDef.Series
 	return nil
 }
 

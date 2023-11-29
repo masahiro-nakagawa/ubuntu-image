@@ -80,6 +80,7 @@ type SmInterface interface {
 	Run() error
 	Teardown() error
 	SetCommonOpts(commonOpts *commands.CommonOpts, stateMachineOpts *commands.StateMachineOpts)
+	SetSeries() error
 }
 
 // stateFunc allows us easy access to the function names, which will help with --resume and debug statements
@@ -110,6 +111,8 @@ type StateMachine struct {
 	SectorSize    quantity.Size // parsed (converted) sector size
 	RootfsSize    quantity.Size
 	tempDirs      temporaryDirectories
+
+	series string
 
 	// The flags that were passed in on the command line
 	commonFlags       *commands.CommonOpts
