@@ -12,17 +12,13 @@ MKFS_CONF=$SNAPCRAFT_PART_INSTALL/etc/ubuntu-image/mkfs
 
 mkdir -p $MKFS_CONF
 
-FULL_SERIES=$(ubuntu-distro-info --supported -f)
-
-IFS=$'\n'
 
 ubuntu-distro-info --supported -f > supported
 ubuntu-distro-info --supported-esm -f > supported_esm
 
 TOTAL_SERIES=$(sort supported supported_esm | uniq)
 
-echo $TOTAL_SERIES
-
+IFS=$'\n'
 for FULL_SERIES in $TOTAL_SERIES; do
     SERIES_RELEASE=$(echo $FULL_SERIES | awk '{split($0,r,"\""); print tolower(r[2])}' | cut -d " " -f 1)
     SERIES_CODENAME=$(echo $FULL_SERIES | cut -d " " -f 2)
