@@ -297,6 +297,14 @@ func TestFailedCopyStructureContent(t *testing.T) {
 	asserter.AssertErrContains(err, "Error listing contents of volume")
 	osReadDir = os.ReadDir
 
+	// Set invalid value in MKE2FS_CONFIG_ENV
+	var mk2fsConfigEnvPrev = MKE2FS_CONFIG_ENV
+	MKE2FS_CONFIG_ENV = "test="
+	err = stateMachine.copyStructureContent(volume, rootfsStruct, 0, "",
+		filepath.Join("/tmp", uuid.NewString()+".img"))
+	asserter.AssertErrContains(err, "Error preparing env for mkfs")
+	MKE2FS_CONFIG_ENV = mk2fsConfigEnvPrev
+
 	// mock gadget.MkfsWithContent
 	mkfsMakeWithContent = mockMkfsWithContent
 	defer func() {

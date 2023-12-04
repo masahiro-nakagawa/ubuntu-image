@@ -74,11 +74,7 @@ func (classicStateMachine *ClassicStateMachine) Setup() error {
 		return err
 	}
 
-	if err := classicStateMachine.SetSeries(); err != nil {
-		return err
-	}
-
-	return nil
+	return classicStateMachine.SetSeries()
 }
 
 func (classicStateMachine *ClassicStateMachine) SetSeries() error {

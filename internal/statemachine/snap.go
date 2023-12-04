@@ -61,11 +61,7 @@ func (snapStateMachine *SnapStateMachine) Setup() error {
 		return err
 	}
 
-	if err := snapStateMachine.SetSeries(); err != nil {
-		return err
-	}
-
-	return nil
+	return snapStateMachine.SetSeries()
 }
 
 func (snapStateMachine *SnapStateMachine) SetSeries() error {
