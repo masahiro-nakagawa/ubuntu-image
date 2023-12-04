@@ -54,7 +54,7 @@ func (packStateMachine *PackStateMachine) Setup() error {
 	return nil
 }
 
-// Dummy method to satisfy the interface. This is not used when packing.
+// Placeholder method to satisfy the interface. This is not used when packing.
 func (packStateMachine *PackStateMachine) SetSeries() error {
 	return nil
 }
