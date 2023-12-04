@@ -1418,3 +1418,68 @@ func TestStateMachine_setConfDefDir(t *testing.T) {
 		})
 	}
 }
+
+type mockEnvHolder struct {
+	env map[string]string
+}
+
+func (m *mockEnvHolder) Getenv(key string) string {
+	return m.env[key]
+}
+
+func (m *mockEnvHolder) Setenv(key, value string) error {
+	m.env[key] = value
+	return nil
+}
+
+func TestStateMachine_setMk2fsConf(t *testing.T) {
+	type fields struct {
+		series string
+	}
+	tests := []struct {
+		name         string
+		fields       fields
+		snapEnv      string
+		mkfsEnv      string
+		mkfsBasePath string
+		want         string
+		expectedErr  string
+	}{
+		{
+			name: "set env with sucess",
+			fields: fields{
+				series: "mantic",
+			},
+			snapEnv:      "testdata/mkfs",
+			mkfsEnv:      "base_path_test",
+			mkfsBasePath: "base_path_test",
+			want:         "testdata/mkfs/base_path_test/mantic/mke2fs.conf",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			asserter := &helper.Asserter{T: t}
+			envHolder := &mockEnvHolder{
+				env: map[string]string{"SNAP": tt.snapEnv},
+			}
+			stateMachine := &StateMachine{series: tt.fields.series}
+			osGetenv = envHolder.Getenv
+			osSetenv = envHolder.Setenv
+			OLD_MKE2FS_BASE_PATH := MKE2FS_BASE_PATH
+			MKE2FS_BASE_PATH = tt.mkfsBasePath
+
+			t.Cleanup(func() {
+				osGetenv = os.Getenv
+				osSetenv = os.Setenv
+				MKE2FS_BASE_PATH = OLD_MKE2FS_BASE_PATH
+			})
+
+			err := stateMachine.setMk2fsConf()
+			if err != nil || len(tt.expectedErr) != 0 {
+				asserter.AssertErrContains(err, tt.expectedErr)
+			}
+			got := envHolder.env[MKE2FS_CONFIG_ENV]
+			asserter.AssertEqual(tt.want, got)
+		})
+	}
+}

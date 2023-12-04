@@ -262,9 +262,15 @@ func (stateMachine *StateMachine) copyStructureContent(volume *gadget.Volume,
 
 // The MKE2FS_BASE_PATH folder is setup to handle codename and release number as a series.
 func (stateMachine *StateMachine) setMk2fsConf() error {
-	mk2fsConfPath := strings.Join([]string{os.Getenv("SNAP"), MKE2FS_BASE_PATH, stateMachine.series, MKE2FS_CONFIG_FILE}, "/")
+	mk2fsConfPath := strings.Join([]string{osGetenv("SNAP"), MKE2FS_BASE_PATH, stateMachine.series, MKE2FS_CONFIG_FILE}, "/")
 
-	return os.Setenv(MKE2FS_CONFIG_ENV, mk2fsConfPath)
+	_, err := os.Stat(mk2fsConfPath)
+	if err != nil {
+		fmt.Printf("WARNING: No mkfs configuration found for this series: %s. Will fallback on the default one.", stateMachine.series)
+		return nil
+	}
+
+	return osSetenv(MKE2FS_CONFIG_ENV, mk2fsConfPath)
 }
 
 // handleSecureBoot handles a special case where files need to be moved from /boot/ to
