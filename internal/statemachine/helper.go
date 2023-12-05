@@ -30,7 +30,7 @@ import (
 var (
 	MKE2FS_CONFIG_ENV  = "MKE2FS_CONFIG"
 	MKE2FS_CONFIG_FILE = "mke2fs.conf"
-	MKE2FS_BASE_PATH   = "/etc/ubuntu-image/mkfs/"
+	MKE2FS_BASE_PATH   = "/etc/ubuntu-image/mkfs"
 )
 
 // validateInput ensures that command line flags for the state machine are valid. These
@@ -266,7 +266,7 @@ func (stateMachine *StateMachine) setMk2fsConf() error {
 
 	_, err := os.Stat(mk2fsConfPath)
 	if err != nil {
-		fmt.Printf("WARNING: No mkfs configuration found for this series: %s. Will fallback on the default one.", stateMachine.series)
+		fmt.Printf("WARNING: No mkfs configuration found for this series: %s. Will fallback on the default one.\n", stateMachine.series)
 		return nil
 	}
 

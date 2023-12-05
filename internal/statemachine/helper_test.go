@@ -234,7 +234,9 @@ func TestFailedHandleLkBootloader(t *testing.T) {
 // functions and setting invalid bs= arguments in dd
 func TestFailedCopyStructureContent(t *testing.T) {
 	asserter := helper.Asserter{T: t}
-	var stateMachine StateMachine
+	stateMachine := StateMachine{
+		series: "mantic",
+	}
 	stateMachine.commonFlags, stateMachine.stateMachineFlags = helper.InitCommonOpts()
 	stateMachine.YamlFilePath = filepath.Join("testdata", "gadget_tree",
 		"meta", "gadget.yaml")
@@ -298,12 +300,24 @@ func TestFailedCopyStructureContent(t *testing.T) {
 	osReadDir = os.ReadDir
 
 	// Set invalid value in MKE2FS_CONFIG_ENV
-	var mk2fsConfigEnvPrev = MKE2FS_CONFIG_ENV
+	OLD_MKE2FS_CONFIG_ENV := MKE2FS_CONFIG_ENV
 	MKE2FS_CONFIG_ENV = "test="
+
+	err = os.Setenv("SNAP", "testdata/mkfs")
+	asserter.AssertErrNil(err, true)
+
+	OLD_MKE2FS_BASE_PATH := MKE2FS_BASE_PATH
+	MKE2FS_BASE_PATH = "base_path_test"
+
+	t.Cleanup(func() {
+		MKE2FS_BASE_PATH = OLD_MKE2FS_BASE_PATH
+	})
+
 	err = stateMachine.copyStructureContent(volume, rootfsStruct, 0, "",
 		filepath.Join("/tmp", uuid.NewString()+".img"))
 	asserter.AssertErrContains(err, "Error preparing env for mkfs")
-	MKE2FS_CONFIG_ENV = mk2fsConfigEnvPrev
+	MKE2FS_CONFIG_ENV = OLD_MKE2FS_CONFIG_ENV
+	MKE2FS_BASE_PATH = OLD_MKE2FS_BASE_PATH
 
 	// mock gadget.MkfsWithContent
 	mkfsMakeWithContent = mockMkfsWithContent
