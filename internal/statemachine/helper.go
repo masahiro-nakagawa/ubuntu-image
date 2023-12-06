@@ -236,14 +236,11 @@ func (stateMachine *StateMachine) copyStructureContent(volume *gadget.Volume,
 				contentRoot, err.Error())
 		}
 
-		fmt.Printf("current MKE2FS_CONFIG_ENV: %v", os.Getenv(MKE2FS_CONFIG_ENV))
 		// select the mkfs.ext4 conf to use
 		err = stateMachine.setMk2fsConf()
 		if err != nil {
 			return fmt.Errorf("Error preparing env for mkfs: %s", err.Error())
 		}
-		fmt.Printf("after setting it MKE2FS_CONFIG_ENV: %v", os.Getenv(MKE2FS_CONFIG_ENV))
-		// defer os.Unsetenv(MKE2FS_CONFIG_ENV)
 
 		// use mkfs functions from snapd to create the filesystems
 		if structure.Content != nil || len(contentFiles) > 0 {
