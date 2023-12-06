@@ -1520,6 +1520,7 @@ func TestStateMachine_setMk2fsConf(t *testing.T) {
 				osGetenv = os.Getenv
 				osSetenv = os.Setenv
 				MKE2FS_BASE_PATH = OLD_MKE2FS_BASE_PATH
+				os.Unsetenv(MKE2FS_CONFIG_ENV)
 			})
 
 			err := stateMachine.setMk2fsConf()
