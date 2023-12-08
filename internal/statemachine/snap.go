@@ -77,7 +77,9 @@ func (snapStateMachine *SnapStateMachine) SetSeries() error {
 	return nil
 }
 
-// Copied and adapted from snapd/image/image_linux.go
+// decodeModelAssertion() was copied and slightly adapted from image/image_linux.go
+// in https://github.com/snapcore/snapd/
+// Commit: 6ab16e24bc7e2ee386a07716a5b3eeb520ffc022
 
 // these are postponed, not implemented or abandoned, not finalized,
 // don't let them sneak in into a used model assertion
