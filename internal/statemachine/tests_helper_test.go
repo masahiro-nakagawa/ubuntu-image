@@ -20,6 +20,7 @@ var basicImageDef = imagedefinition.ImageDefinition{
 	Series:       getHostSuite(),
 	Rootfs: &imagedefinition.Rootfs{
 		Archive: "ubuntu",
+		Mirror:  "http://archive.ubuntu.com/ubuntu/",
 	},
 	Customization: &imagedefinition.Customization{},
 }
