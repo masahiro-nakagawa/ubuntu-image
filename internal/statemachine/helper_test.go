@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -649,7 +648,6 @@ func TestGenerateGerminateCmd(t *testing.T) {
 				},
 			}
 			germinateCmd := generateGerminateCmd(imageDef)
-			fmt.Print(germinateCmd)
 
 			if !strings.Contains(germinateCmd.String(), tc.mirror) {
 				t.Errorf("germinate command \"%s\" has incorrect mirror. Expected \"%s\"",
