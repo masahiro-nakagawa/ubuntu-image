@@ -14,6 +14,7 @@ import (
 
 // Prepare the image
 func (stateMachine *StateMachine) prepareImage() error {
+	fmt.Println("Execute prepare image")
 	snapStateMachine := stateMachine.parent.(*SnapStateMachine)
 
 	var imageOpts image.Options
@@ -73,6 +74,7 @@ func (stateMachine *StateMachine) prepareImage() error {
 		}()
 	}
 
+	fmt.Println(imageOpts)
 	if err := imagePrepare(&imageOpts); err != nil {
 		return fmt.Errorf("Error preparing image: %s", err.Error())
 	}
@@ -80,34 +82,62 @@ func (stateMachine *StateMachine) prepareImage() error {
 	// set the gadget yaml location
 	snapStateMachine.YamlFilePath = filepath.Join(stateMachine.tempDirs.unpack, "gadget", gadgetYamlPathInTree)
 
-	//generate path to top level diectory in system-seed/systems and copy auto-import.assert into it
+	//check if --auto-import is specified
+	if snapStateMachine.Opts.AutoImport != "" {
+		p, _ := os.Getwd()
+		fmt.Println("Current directory is ", p)
+		fmt.Println("auto-import is specified", snapStateMachine.Opts.AutoImport)
 
-	dest := filepath.Join(stateMachine.tempDirs.unpack, "system-seed/systems")
-	entries, err := os.ReadDir(dest)
-	if err != nil {
-		return fmt.Errorf("failed to read %s", err.Error())
-	}
-	for _, e := range entries {
-		//create complete path
-		dest = filepath.Join(dest, e.Name())
-		dest = filepath.Join(dest, "auto-import.assert")
-		copyFileContents(dest)
+		ex, errhiro := os.Executable()
+		if errhiro != nil {
+			panic(err)
+		}
+		exPath := filepath.Dir(ex)
+		fmt.Println("executed from: ", exPath)
+
+		//check specified auto-import.assert exists
+		_, err := os.Stat(snapStateMachine.Opts.AutoImport)
+		if err != nil {
+			return fmt.Errorf("auto-import.assert does not exist at %s", snapStateMachine.Opts.AutoImport)
+		}
+		//generate path to top level diectory in system-seed/systems and copy auto-import.assert into it
+		dest := filepath.Join(stateMachine.tempDirs.unpack, "system-seed/systems")
+		entries, err := os.ReadDir(dest)
+		if err != nil {
+			return fmt.Errorf("failed to read %s", err.Error())
+		}
+		/*
+			ex, err := os.Executable()
+			if err != nil {
+				panic(err)
+			}
+			exPath := filepath.Dir(ex)
+		*/
+		fmt.Println(exPath)
+		for _, e := range entries {
+			//create complete path
+			dest = filepath.Join(dest, e.Name())
+			dest = filepath.Join(dest, "auto-import.assert")
+			fmt.Println("Copying from ", snapStateMachine.Opts.AutoImport, " to ", dest)
+			copyFileContents(dest, snapStateMachine.Opts.AutoImport)
+		}
 	}
 
 	return nil
 }
 
 // copyAutoImportAssert copies auto-import.assert file to /system-seed/systems/*
-func copyFileContents(dst string) (err error) {
-	src := "auto-import.assert"
+func copyFileContents(dest string, src string) (err error) {
+	//src := "auto-import.assert"
 	in, err := os.Open(src)
 	if err != nil {
 		return fmt.Errorf("failed to open atuo-import.assert. %s", err.Error())
 	}
 	defer in.Close()
-	out, err := os.Create(dst)
+	out, err := os.Create(dest)
 	if err != nil {
-		return
+		fmt.Println(dest)
+		return fmt.Errorf("failed to create dest file")
 	}
 	defer func() {
 		cerr := out.Close()
